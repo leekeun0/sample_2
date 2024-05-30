@@ -6,12 +6,13 @@ function setup() {
     createCanvas(640, 480);
     video = createCapture(VIDEO);
     video.hide();
-    handpose = ml5.handpose(video, modelReady);
-    handpose.on('predict', results => predictions = results);
-}
-
-function modelReady() {
-    console.log("Model ready!");
+    handpose = ml5.handpose(video, function() {
+        console.log("Model loaded!");
+    });
+    handpose.on('predict', results => {
+        predictions = results;
+        console.log(predictions); // Debugging: Log predictions to see if it's working
+    });
 }
 
 function draw() {
@@ -27,7 +28,9 @@ function drawKeypoints() {
             fill(255, 0, 0);
             noStroke();
             ellipse(keypoint[0], keypoint[1], 10, 10);
-            particles.push(new Particle(keypoint[0], keypoint[1]));
+            if (particles.length < 200) {  // Limit the number of particles to avoid performance issues
+                particles.push(new Particle(keypoint[0], keypoint[1]));
+            }
         }
     }
     updateParticles();
